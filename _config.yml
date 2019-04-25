@@ -7,7 +7,7 @@ author: "Rodrigo M Vega"
 logo: assets/img/profile.svg
 background-img: assets/img/wallpaper.png
 overlay-top: 0.2
-overlay-bottom: 0.8
+overlay-bottom: 0.4
 intro-width: 35em
 link-color: "#f47f00"
 dark: false
