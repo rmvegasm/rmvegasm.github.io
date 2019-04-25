@@ -4,4 +4,4 @@ source "https://rubygems.org"
 # gemspec
 gem "github-pages", group: :jekyll_plugins
 gem "jekyll-paginate"
-gem "jekyll-theme-wallpaper-home", "~> 0.1"
+#gem "jekyll-theme-wallpaper-home"
