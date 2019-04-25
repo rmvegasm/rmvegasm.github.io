@@ -1,0 +1,79 @@
+# SITE CONFIGURATION
+url: "https://rmvegasm.github.io"
+baseurl: ""
+title: "Rodrigo M. Vega" # site's title
+description: "Rodrigo M. Vega's personal site" # used by search engines
+author: "Rodrigo M Vega"
+logo: assets/img/profile.svg
+background-img: assets/img/wallpaper.png
+overlay-top: 0.2
+overlay-bottom: 0.8
+intro-width: 35em
+link-color: "#f47f00"
+dark: false
+math: true
+theme: jekyll-theme-wallpaper-home
+
+# GOOGLE FONTS
+
+google-fonts:
+  main-font: "Open+Sans"
+  header-font: "Oswald:300"
+  code-font: "Source+Code+Pro"
+
+# FOOTER LINKS
+social:
+  mail: rmvegasm@gmail.com
+  twitter:
+  rss: true
+  behance:
+  bitbucket:
+  dribbble:
+  facebook:
+  flickr:
+  gitlab:
+  github: rmvegasm
+  instagram:
+  keybase:
+  linkedin: # full url
+  pinterest:
+  researchgate: # full url
+  reddit:
+  soundcloud:
+  stack_exchange: # full url
+  tumblr:
+  vimeo:
+  wordpress:
+  youtube:
+
+# FOOTER TEXT
+footer-text: >
+  Powered by <a href="http://jekyllrb.com/">Jekyll</a>,
+  <a href="https://getbootstrap.com/">Bootstrap</a> 
+  and <a href="http://github.com/">Github</a>.
+
+# BUILD SETTINGS
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  math_engine: mathjax
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    span:
+      disable: false
+syntax-theme:
+
+# PAGINATION
+#
+#paginate: 5
+#paginate_path: "blog/page:num"
+
+# PORTFOLIO
+
+collections:
+  portfolio:
+    output: true
+
+plugins: [jekyll-seo-tag, jekyll-feed] #, jekyll-paginate]
+exclude: ["Gemfile", "Gemfile.lock", "jekyll-theme-wallpaper-home.gemspec", "*.gem", "LICENSE", "README.md"]
