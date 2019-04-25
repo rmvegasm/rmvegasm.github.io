@@ -13,6 +13,7 @@ link-color: "#f47f00"
 dark: true
 math: true
 #theme: jekyll-theme-wallpaper-home
+remote_theme: rmvegasm/jekyll-theme-wallpaper-home
 
 # GOOGLE FONTS
 
