@@ -1,0 +1,28 @@
+<!-- _includes/portfolio.html -->
+
+{% include resolve-dark.liquid %}
+{% if site.portfolio %}
+<div class="d-flex flex-wrap justify-content-around">
+  {% for post in site.portfolio %}
+  <div class="card {% if dark %} bg-dark {% else %} bg-light text-dark {% endif %}
+  shadow rounded my-2"
+    style="max-width: 21rem;">
+      {% if post.img %}
+      <img src="{{ post.img }}" class="card-img-top" alt="logo">
+      {% endif %}
+      <div class="card-body">
+        <h3 class="card-title">{{ post.title }}</h3>
+        {% include tags.html %}
+        {% if post.description %}
+        <p class="card-text">{{ post.description }}</p>
+        {% endif %}
+        <a href="{{ post.url | absolute_url }}" class="btn btn-block stretched-link">
+          <span class="fas fa-plus"></span>
+        </a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- _includes/portfolio.html EOF-->
