@@ -1,0 +1,11 @@
+---
+title: Rodrigo M. Vega
+css: welcome.css
+---
+
+I'm a self-taught R programmer with a strong research background. I love
+learning, take pride in finding new and creative solutions to problems, fixing
+broken things and explaining complex ideas in very simple terms. I thrive by
+helping others.
+
+This is my personal site, feel free to wonder around ;)

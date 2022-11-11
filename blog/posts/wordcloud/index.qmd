@@ -1,0 +1,260 @@
+---
+title: A rudimentary wordcloud from twitter data
+categories:
+  - R
+  - wordcloud
+  - rtweet
+  - tutorial
+date: "2022/09/17"
+---
+
+In this post I'll build a wordcloud from twitter texts. I'll be using the
+amazing [rtweet][rtweet] package to access the [twitter API][twitterAPI]. At the
+time of writing, rtweet can only acces the version 1 of the API, from which
+there is possible to obtain a single table with the query results. Version 2
+allows for much more control on the query output but is not yet implemented in
+rtweet and I wanted to try it out ;)
+
+The wordcloud is a powerfull way to visualize word frequencies in a text and
+grasp something about the topics covered within. To build it we need a list of
+words and the frequency for each of them. There is much more than it seems to
+this, but as a first *naive* approximation one could just separate each document
+into single words and build a table from that. This is exactly what this post
+will cover.
+
+# Accessing twitter from R
+
+The twitter API offers extensive functionality to query *tweets*, with different
+levels of access according to your account type. For this exercise we only need
+the most basic level, basically we want to download a certain ammount of
+*tweets* that match a *string*. This is the same thing as opening the app on
+your phone and *searching* for a keyword. We don't need to register an app for
+this (using v.1), and rtweet provides a handy function to authenticate the
+*currently logged-in user* and store the relevant info for future sessions.
+We'll be using this method as this is a one-time query.
+
+```{r}
+library('rtweet')
+# Authenticate the currently logged-in user and store credentials, this needs to
+# be done only once per machine:
+# rtweet::auth_setup_default()
+
+# Do not perform query if results are already stored:
+tbl_file = 'tweets_tbl.rds'
+tweets_file = 'tweets.csv'
+
+if (file.exists(tweets_file)) {
+  tweets = read.csv(tweets_file)
+} else {
+  tweets = rtweet::search_tweets(
+    'chile -filter:quote -filter:media lang:es',
+    n = 2000,
+    include_rts = FALSE,
+    retryonratelimit = TRUE
+  )
+  # let's save the tibble just in case and write a csv ommiting list cols
+  saveRDS(tweets, tbl_file)
+  tweets = tweets[, sapply(tweets, class) != 'list'] |> as.data.frame()
+  write.csv(tweets, tweets_file, row.names = FALSE)
+}
+```
+
+Let's take a look at what we got:
+
+```{r, purl = FALSE}
+str(tweets, give.attr = FALSE)
+```
+
+Let's now have a look at a sample text. The most *retweeted* text is:
+
+```{r, purl = FALSE}
+with(tweets, full_text[which.max(retweet_count)]) |>
+  strwrap() |>
+  cat(fill = TRUE)
+```
+
+There's something here that is not a word but a *link*. This is rather common
+nowadays, text is mingled with *links*, *hashtags*, *mentions* and other things.
+This will be a problem if we treat them as just another word. Let's create a
+sample text that has all of these things:
+
+```{r, purl = FALSE}
+tx = 'Hola @persona, este mensaje no tiene otro objetivo que ayudarnos
+a filtrar cosas que no son palabras. 3215. https://aquinoes.cl #aquitampoco'
+```
+
+We can use this sample as a test case and see if we're able to get a word count
+for *meaningful* words. If this was only regular text the task would reduce to
+splitting by words, removing punctuation characters, adjusting capitalization
+and counting; but having these *things-that-are-not-a-word* we'll instead need to:
+
+1. split by words
+1. remove *links*
+1. remove *hashtags*
+1. remove *mentions* (e.g. `'@camara_cl'`)
+1. remove *punctuation* and other non alphabetic characters
+1. remove any *empty string* left
+
+Let's start by splitting:
+
+```{r, purl = FALSE}
+strsplit(tx, '[[:space:]]')
+```
+
+Note that `strsplit()` returns a `list`. This will be the starting point when
+processing all the *tweets*, so for now we'll focus on the only element of this
+list:
+
+```{r, purl = FALSE}
+tx = strsplit(tx, '[[:space:]+]')[[1L]]
+tx
+```
+
+Before we remove non alpha-numeric characters we'll want to get rid of *links*,
+*hashtags* and *mentions*, since these are defined by such characters. For
+consistency we'll treat numbers also here:
+
+```{r}
+is_link = function (x) grepl('^[[:lower:]]+://.+', x)
+is_hashtag = function (x) grepl('^#.+', x)
+is_mention = function (x) grepl('^@.+', x)
+is_number = function (x) grepl('^[[:digit:]]+[[:punct:]]*$', x)
+```
+
+Let's see if these work:
+
+```{r, purl = FALSE}
+tx[is_link(tx)]
+tx[is_hashtag(tx)]
+tx[is_mention(tx)]
+tx[is_number(tx)]
+```
+
+Nailed it. Now it's easy to remove these things:
+
+```{r, purl = FALSE}
+tx = tx[!is_link(tx)]
+tx = tx[!is_hashtag(tx)]
+tx = tx[!is_mention(tx)]
+tx = tx[!is_number(tx)]
+tx
+```
+
+This looks good, now let's remove *punctuation* and anything that is not an
+alpha-numeric character:
+
+```{r, purl = FALSE}
+tx = lapply(tx, gsub, pattern = '[^[:alnum:]]', replacement = '') |> unlist()
+tx
+```
+
+Finally, let's filter out any empty strings and get everything to lower case:
+
+```{r, purl = FALSE}
+tx = tx[tx != ''] |> tolower()
+tx
+```
+
+Since we'll be doing this same procedure to every *tweet* the cleanest way would
+be to pack it all into a function we can `apply` over the *tweets* vector:
+
+```{r}
+extract_words = function (x) {
+  x = x[!is_link(x)]
+  x = x[!is_hashtag(x)]
+  x = x[!is_mention(x)]
+  x = x[!is_number(x)]
+  x = lapply(x, gsub, pattern = '[^[:alnum:]]', replacement = '') |> unlist()
+  x = x[x != '']
+  tolower(x)
+}
+```
+
+With this function we can *cleanse* every tweet in a single call to `lapply`:
+
+```{r purl = FALSE}
+tweets[['full_text']] |> strsplit(split = '[[:space:]]') |> lapply(extract_words) |> head()
+```
+
+Now we have a list of character vectors containing only words, but most of those
+word aren't *meaningful*. For this post we'll use a rough hack and just filter
+those words that have between 5 and 10 characters. This will almost certainly
+crop all short illatives such as *de*, *y*, *para*; but is by no means a proper
+way of ensuring we're left with all *meaninful* words (I'm sure *god* would
+agree that at the *end* the value of a *word* is not given by it's number of
+characters).  That said, let's get into it:
+
+```{r}
+clean_tweets = tweets[['full_text']] |>
+  strsplit(split = '[[:space:]+]') |>
+  lapply(extract_words)
+
+words = lapply(clean_tweets, function (x) {
+  n = nchar(x)
+  x[n >= 5 & n <= 10]
+})
+
+word_bag = unlist(words)
+```
+
+Let's take a look at the 12 most frequent words:
+
+```{r, purl = FALSE}
+table(word_bag) |> sort(decreasing = TRUE) |> head(n = 13)
+```
+
+The most frequent word is the one we used for the query, which is to be expected
+and gives us no info about the topics being commented. We should by all means
+remove this word:
+
+```{r}
+word_bag = local({
+  query = 'chile'
+  word_bag[!(word_bag %in% query)]
+})
+```
+
+Now this is boring, since we're leaving out all semantic structure and treating
+text as a *word bag* we should at least make it look beautiful. By far the most
+compelling visualization for word fequencies is the *wordcloud*. We'll use the
+[wordcloud2][wordcloud2] package along the [wesanderson][wesanderson] color
+palettes to build one. Wordcloud's  main function expects a `data.frame` with
+`word` and `freq` as columns, so let's construct that from our *word bag* and
+generate a cloud:
+
+```{r}
+library('wordcloud2')
+library('wesanderson')
+
+wf = local({
+  wb = table(word_bag)
+  word = names(wb)
+  freq = as.numeric(wb)
+  data.frame(word, freq)[freq >= 10, ]
+})
+
+# Nice colors from 'The Darjeeling Express'
+clrs = rep(wesanderson::wes_palette('Darjeeling1', 5), length.out = nrow(wf))
+
+wordcloud2::wordcloud2(wf,
+  background = 'transparent',
+  color = clrs,
+  size = .3)
+```
+
+## Write a summary and conclusion here
+
+```{r, include = FALSE, purl = FALSE}
+knitr::purl('index.qmd', output = 'script.r')
+```
+
+---
+
+```{r filename = 'Complete Code', file = 'script.r', eval = FALSE, purl = FALSE}
+
+```
+
+[wordcloud2]: https://cran.r-project.org/web/packages/wordcloud2/vignettes/wordcloud.html
+[twitterAPI]: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjiqurGgOj6AhWdDLkGHfjBBRcQFnoECA8QAQ&url=https%3A%2F%2Fdeveloper.twitter.com%2Fen%2Fdocs%2Ftwitter-api&usg=AOvVaw07KoWHf5ew9enXbRwVd6eq
+[rtweet]: https://github.com/ropensci/rtweet
+[wesanderson]: https://github.com/karthik/wesanderson

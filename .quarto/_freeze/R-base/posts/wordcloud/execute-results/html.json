@@ -1,0 +1,14 @@
+{
+  "hash": "8e6852a08838d59223ba9497a529e519",
+  "result": {
+    "markdown": "plot(rnorm(100), rnorm(100))\nplot(cars)\nplot(cars)\nx <- NA\n.x <- list(say = 'no more')\nlibrary(sp)\nlibrary(raster)\nlibrary(sf)\nlibrary(spData)\nlibrary(spDataLarge)\nlibrary(rgdal)\nlibrary(gstat)\nlibrary(maps)\nlibrary(splancs)\nrequire(gridExtra)\n1 +1\n1 + 1\n2 + 2\n1:100\n1 + 1\n?trim\n?glue\ntx = \"Everything seems to go round above my head,\nand within my stomach... The feeling is as if\nreality itself was indistinguishable from a dream...\nshould I be concearned about this? maybe seek for \nprofessional help? or is this to be expected\nwhen you get fired? Time will tell...\"\ntx\nsplit(tx, split = ' ')\nstrsplit(tx, split = ' ')\n?strsplit\n?'regular expression'\nstrsplit(tx, split = '[:space:]')\n?'regular expression'\nstrsplit(tx, split = '[:blank:]')\n?'regular expression'\n?strsplit\nstrsplit(tx, split = '[:blank:]', pearl = TRUE)\n?strsplit\nstrsplit(tx, split = '[:blank:]', perl = TRUE)\nstrsplit(tx, split = '[ \\n]')\nstrsplit(tx, split = '[ \\n]') |> gsub('s/[?.]//')\n?gsub\nstrsplit(tx, split = '[ \\n]') |> gsub('s/[?.]//', _)\n?gsub\nstrsplit(tx, split = '[ \\n]') |> gsub('[?.]', '', x = _)\nstrsplit(tx, split = '[ \\n]') |> gsub('[?.]', '', x = _) |> as.character()\n?gsub\ntx_bw = strsplit(tx, split = '[ \\n]')\ngsub('[?.]', '', tx_bw)\ngsub('[?.]', '', tx_bw)\n?gsub\nvec_gsub = Vectorize(gsub)\nvec_gsub('[?.]', '', tx_bw)\nvec_gsub('[?.,:;!¿¡]', '', tx_bw)\ntx_bw_np = vec_gsub('[?.,:;!¿¡]', '', tx_bw)\nnchar(tx_bw_np)\n?simplyfy\n?as.vector\n?as.vector\ntx_bw_np = as.vector(vec_gsub('[?.,:;!¿¡]', '', tx_bw), mode = character)\ntx_bw_np = as.vector(vec_gsub('[?.,:;!¿¡]', '', tx_bw), mode = 'character')\ntx_bw_np\nnchar(tx_bw_np)\nn = nchar(tx_bw_np)\ntx_bw_np_n = tx_bw_np[n >= 5 & n <= 10]\ntx_bw_np_n\ntx_bw_np_n = tolower(tx_bw_np[n >= 5 & n <= 10])\ntx_bw_np_n\ngrapl('reality', tx_bw_np_n)\ngrepl('reality', tx_bw_np_n)\nany(grepl('reality', tx_bw_np_n))\nany(grepl('real', tx_bw_np_n))\nany(grepl('real', tx_bw_np_n, fixed = TRUE))\nany(grepl('real', tx_bw_np_n))\nany('ral %in% tx_bw_np_n)\n)\n'\n)\nany('real' %in% tx_bw_np_n)\nany('reality' %in% tx_bw_np_n)\nany(word %in% tx_bw_np_n)\nword = c('reality', 'baloon', 'itself')\nany(word %in% tx_bw_np_n)\n'reality' %in% tx_bw_np_n\n?Vectorize\nlist.files('~/web/quarto/')\nlist.files('~/web/quarto/R-base')\nlist.files('~/web/quarto/R-base/posts')\n?history\nsavehistory('~/web/quarto/R-base/posts/wordcloud.rmd')\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

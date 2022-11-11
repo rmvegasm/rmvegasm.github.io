@@ -1,0 +1,53 @@
+/*-- scss:defaults --*/
+// scss-docs-start color-variables
+$white:    #fff !default;
+$gray-100: #f8f9fa !default;
+$gray-200: #ebebeb !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-600: #888 !default;
+$gray-700: #444 !default;
+$gray-800: #303030 !default;
+$gray-900: #222 !default;
+$black:    #000 !default;
+
+// colors from gruvbox
+$blue:    #458588 !default;
+$indigo:  #076678 !default;
+$purple:  #b16286 !default;
+$pink:    #ff7679 !default;
+$red:     #fb4934 !default;
+$orange:  #d65d0e !default;
+$yellow:  #fabd2f !default;
+$green:   #b8bb26 !default;
+$teal:    #8ec07c !default;
+$cyan:    #83a598 !default;
+// scss-docs-end color-variables
+
+// theme colors
+$primary:       $blue !default;
+$secondary:     $gray-700 !default;
+$success:       $green !default;
+$info:          $cyan !default;
+$warning:       $yellow !default;
+$danger:        $red !default;
+$light:         $gray-500 !default;
+$dark:          $gray-800 !default;
+
+// links
+$link-color: $primary !default;
+
+// navbar
+@import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap');
+$brand-font-family: 'Shadows Into Light', cursive;
+
+/*-- scss:rules --*/
+.navbar-title {
+  font-family: $brand-font-family;
+} 
+
+.navbar-toggler {
+  font-size: 1rem !important;
+  border: transparent !important;
+}

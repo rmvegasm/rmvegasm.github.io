@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.189">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2022-09-17">
+
+<title>COY - A rudimentary wordcloud from twitter data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<link href="../../../profile_oct_2022.png" rel="icon" type="image/png">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="../../../site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<link href="../../../site_libs/wordcloud2-0.0.1/wordcloud.css" rel="stylesheet">
+<script src="../../../site_libs/wordcloud2-0.0.1/wordcloud2-all.js"></script>
+<script src="../../../site_libs/wordcloud2-0.0.1/hover.js"></script>
+<script src="../../../site_libs/wordcloud2-binding-0.2.1/wordcloud2.js"></script>
+
+
+<link rel="stylesheet" href="../../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../../profile_oct_2022.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">COY</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html">Home</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html">About Me</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../blog/index.html">Blog</a>
+  </li>  
+</ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">A rudimentary wordcloud from twitter data</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">wordcloud</div>
+                <div class="quarto-category">rtweet</div>
+                <div class="quarto-category">tutorial</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">September 17, 2022</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#accessing-twitter-from-r" id="toc-accessing-twitter-from-r" class="nav-link active" data-scroll-target="#accessing-twitter-from-r">Accessing twitter from R</a>
+  <ul class="collapse">
+  <li><a href="#write-a-summary-and-conclusion-here" id="toc-write-a-summary-and-conclusion-here" class="nav-link" data-scroll-target="#write-a-summary-and-conclusion-here">Write a summary and conclusion here</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>In this post I’ll build a wordcloud from twitter texts. I’ll be using the amazing <a href="https://github.com/ropensci/rtweet">rtweet</a> package to access the <a href="https://www.google.com/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=&amp;cad=rja&amp;uact=8&amp;ved=2ahUKEwjiqurGgOj6AhWdDLkGHfjBBRcQFnoECA8QAQ&amp;url=https%3A%2F%2Fdeveloper.twitter.com%2Fen%2Fdocs%2Ftwitter-api&amp;usg=AOvVaw07KoWHf5ew9enXbRwVd6eq">twitter API</a>. At the time of writing, rtweet can only acces the version 1 of the API, from which there is possible to obtain a single table with the query results. Version 2 allows for much more control on the query output but is not yet implemented in rtweet and I wanted to try it out ;)</p>
+<p>The wordcloud is a powerfull way to visualize word frequencies in a text and grasp something about the topics covered within. To build it we need a list of words and the frequency for each of them. There is much more than it seems to this, but as a first <em>naive</em> approximation one could just separate each document into single words and build a table from that. This is exactly what this post will cover.</p>
+<section id="accessing-twitter-from-r" class="level1">
+<h1>Accessing twitter from R</h1>
+<p>The twitter API offers extensive functionality to query <em>tweets</em>, with different levels of access according to your account type. For this exercise we only need the most basic level, basically we want to download a certain ammount of <em>tweets</em> that match a <em>string</em>. This is the same thing as opening the app on your phone and <em>searching</em> for a keyword. We don’t need to register an app for this (using v.1), and rtweet provides a handy function to authenticate the <em>currently logged-in user</em> and store the relevant info for future sessions. We’ll be using this method as this is a one-time query.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">'rtweet'</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Authenticate the currently logged-in user and store credentials, this needs to</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># be done only once per machine:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># rtweet::auth_setup_default()</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Do not perform query if results are already stored:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>tbl_file <span class="ot">=</span> <span class="st">'tweets_tbl.rds'</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>tweets_file <span class="ot">=</span> <span class="st">'tweets.csv'</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">file.exists</span>(tweets_file)) {</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  tweets <span class="ot">=</span> <span class="fu">read.csv</span>(tweets_file)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  tweets <span class="ot">=</span> rtweet<span class="sc">::</span><span class="fu">search_tweets</span>(</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">'chile -filter:quote -filter:media lang:es'</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="dv">2000</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">include_rts =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">retryonratelimit =</span> <span class="cn">TRUE</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># let's save the tibble just in case and write a csv ommiting list cols</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(tweets, tbl_file)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  tweets <span class="ot">=</span> tweets[, <span class="fu">sapply</span>(tweets, class) <span class="sc">!=</span> <span class="st">'list'</span>] <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write.csv</span>(tweets, tweets_file, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s take a look at what we got:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(tweets, <span class="at">give.attr =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   2000 obs. of  37 variables:
+ $ created_at                   : chr  "2022-10-18 10:52:59" "2022-10-17 16:44:43" "2022-10-17 17:26:37" "2022-10-18 22:13:35" ...
+ $ id                           : num  1.58e+18 1.58e+18 1.58e+18 1.58e+18 1.58e+18 ...
+ $ id_str                       : num  1.58e+18 1.58e+18 1.58e+18 1.58e+18 1.58e+18 ...
+ $ full_text                    : chr  "A tres años del #EstallidoDelictual el Presidente Boric no ha aprendido absolutamente nada. Fue cómplice de la "| __truncated__ "🔴 Banco Mundial advierte que pobreza en Chile llegará a 10,5% en 2022: La desigualdad también aumentará https:"| __truncated__ "Walmart Chile remata locales y terrenos en distintas comunas de Santiago https://t.co/E1rbFfm8eD" "@danieljadue JADUE  TU Y TUS  REVOLUCIONARIOS. TERRORISTAS QUE MANDASTE A QUEMAR CHILE EERES UN MALDITO CON TU "| __truncated__ ...
+ $ truncated                    : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+ $ display_text_range           : int  279 127 96 163 139 320 43 169 56 122 ...
+ $ source                       : chr  "&lt;a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\"&gt;Twitter for iPhone&lt;/a&gt;" "&lt;a href=\"https://www.echobox.com\" rel=\"nofollow\"&gt;Echobox&lt;/a&gt;" "&lt;a href=\"https://www.echobox.com\" rel=\"nofollow\"&gt;Echobox&lt;/a&gt;" "&lt;a href=\"http://twitter.com/download/android\" rel=\"nofollow\"&gt;Twitter for Android&lt;/a&gt;" ...
+ $ in_reply_to_status_id        : num  NA NA NA 1.58e+18 1.58e+18 ...
+ $ in_reply_to_status_id_str    : num  NA NA NA 1.58e+18 1.58e+18 ...
+ $ in_reply_to_user_id          : num  NA NA NA 1.47e+08 5.80e+07 ...
+ $ in_reply_to_user_id_str      : num  NA NA NA 1.47e+08 5.80e+07 ...
+ $ in_reply_to_screen_name      : chr  NA NA NA "danieljadue" ...
+ $ contributors                 : logi  NA NA NA NA NA NA ...
+ $ is_quote_status              : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+ $ retweet_count                : int  3472 1346 1976 0 0 0 0 0 0 0 ...
+ $ favorite_count               : int  8787 1058 2209 0 0 0 0 0 0 0 ...
+ $ favorited                    : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+ $ retweeted                    : logi  FALSE FALSE FALSE FALSE FALSE FALSE ...
+ $ lang                         : chr  "es" "es" "es" "es" ...
+ $ possibly_sensitive           : logi  NA FALSE FALSE NA NA NA ...
+ $ text                         : chr  "A tres años del #EstallidoDelictual el Presidente Boric no ha aprendido absolutamente nada. Fue cómplice de la "| __truncated__ "🔴 Banco Mundial advierte que pobreza en Chile llegará a 10,5% en 2022: La desigualdad también aumentará https:"| __truncated__ "Walmart Chile remata locales y terrenos en distintas comunas de Santiago https://t.co/E1rbFfm8eD" "@danieljadue JADUE  TU Y TUS  REVOLUCIONARIOS. TERRORISTAS QUE MANDASTE A QUEMAR CHILE EERES UN MALDITO CON TU "| __truncated__ ...
+ $ favorited_by                 : logi  NA NA NA NA NA NA ...
+ $ scopes                       : logi  NA NA NA NA NA NA ...
+ $ display_text_width           : logi  NA NA NA NA NA NA ...
+ $ retweeted_status             : logi  NA NA NA NA NA NA ...
+ $ quoted_status_id             : logi  NA NA NA NA NA NA ...
+ $ quoted_status_id_str         : logi  NA NA NA NA NA NA ...
+ $ quoted_status_permalink      : logi  NA NA NA NA NA NA ...
+ $ quote_count                  : logi  NA NA NA NA NA NA ...
+ $ timestamp_ms                 : logi  NA NA NA NA NA NA ...
+ $ reply_count                  : logi  NA NA NA NA NA NA ...
+ $ filter_level                 : logi  NA NA NA NA NA NA ...
+ $ query                        : logi  NA NA NA NA NA NA ...
+ $ withheld_scope               : logi  NA NA NA NA NA NA ...
+ $ withheld_copyright           : logi  NA NA NA NA NA NA ...
+ $ withheld_in_countries        : logi  NA NA NA NA NA NA ...
+ $ possibly_sensitive_appealable: logi  NA NA NA NA NA NA ...</code></pre>
+</div>
+</div>
+<p>Let’s now have a look at a sample text. The most <em>retweeted</em> text is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(tweets, full_text[<span class="fu">which.max</span>(retweet_count)]) <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">strwrap</span>() <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="at">fill =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>A tres años del #EstallidoDelictual el Presidente Boric no ha aprendido 
+absolutamente nada. Fue cómplice de la legitimación de la violencia y 
+de la destrucción de un Chile que es más pobre, inseguro y desigual que antes 
+ A pesar de eso, sigue enamorado de su fracasada revolución</code></pre>
+</div>
+</div>
+<p>There’s something here that is not a word but a <em>link</em>. This is rather common nowadays, text is mingled with <em>links</em>, <em>hashtags</em>, <em>mentions</em> and other things. This will be a problem if we treat them as just another word. Let’s create a sample text that has all of these things:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tx <span class="ot">=</span> <span class="st">'Hola @persona, este mensaje no tiene otro objetivo que ayudarnos</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="st">a filtrar cosas que no son palabras. 3215. https://aquinoes.cl #aquitampoco'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can use this sample as a test case and see if we’re able to get a word count for <em>meaningful</em> words. If this was only regular text the task would reduce to splitting by words, removing punctuation characters, adjusting capitalization and counting; but having these <em>things-that-are-not-a-word</em> we’ll instead need to:</p>
+<ol type="1">
+<li>split by words</li>
+<li>remove <em>links</em></li>
+<li>remove <em>hashtags</em></li>
+<li>remove <em>mentions</em> (e.g.&nbsp;<code>'@camara_cl'</code>)</li>
+<li>remove <em>punctuation</em> and other non alphabetic characters</li>
+<li>remove any <em>empty string</em> left</li>
+</ol>
+<p>Let’s start by splitting:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">strsplit</span>(tx, <span class="st">'[[:space:]]'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+ [1] "Hola"                "@persona,"           "este"               
+ [4] "mensaje"             "no"                  "tiene"              
+ [7] "otro"                "objetivo"            "que"                
+[10] "ayudarnos"           "a"                   "filtrar"            
+[13] "cosas"               "que"                 "no"                 
+[16] "son"                 "palabras."           "3215."              
+[19] "https://aquinoes.cl" "#aquitampoco"       </code></pre>
+</div>
+</div>
+<p>Note that <code>strsplit()</code> returns a <code>list</code>. This will be the starting point when processing all the <em>tweets</em>, so for now we’ll focus on the only element of this list:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>tx <span class="ot">=</span> <span class="fu">strsplit</span>(tx, <span class="st">'[[:space:]+]'</span>)[[1L]]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>tx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Hola"                "@persona,"           "este"               
+ [4] "mensaje"             "no"                  "tiene"              
+ [7] "otro"                "objetivo"            "que"                
+[10] "ayudarnos"           "a"                   "filtrar"            
+[13] "cosas"               "que"                 "no"                 
+[16] "son"                 "palabras."           "3215."              
+[19] "https://aquinoes.cl" "#aquitampoco"       </code></pre>
+</div>
+</div>
+<p>Before we remove non alpha-numeric characters we’ll want to get rid of <em>links</em>, <em>hashtags</em> and <em>mentions</em>, since these are defined by such characters. For consistency we’ll treat numbers also here:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>is_link <span class="ot">=</span> <span class="cf">function</span> (x) <span class="fu">grepl</span>(<span class="st">'^[[:lower:]]+://.+'</span>, x)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>is_hashtag <span class="ot">=</span> <span class="cf">function</span> (x) <span class="fu">grepl</span>(<span class="st">'^#.+'</span>, x)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>is_mention <span class="ot">=</span> <span class="cf">function</span> (x) <span class="fu">grepl</span>(<span class="st">'^@.+'</span>, x)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>is_number <span class="ot">=</span> <span class="cf">function</span> (x) <span class="fu">grepl</span>(<span class="st">'^[[:digit:]]+[[:punct:]]*$'</span>, x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s see if these work:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>tx[<span class="fu">is_link</span>(tx)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "https://aquinoes.cl"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tx[<span class="fu">is_hashtag</span>(tx)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "#aquitampoco"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>tx[<span class="fu">is_mention</span>(tx)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "@persona,"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>tx[<span class="fu">is_number</span>(tx)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "3215."</code></pre>
+</div>
+</div>
+<p>Nailed it. Now it’s easy to remove these things:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>tx <span class="ot">=</span> tx[<span class="sc">!</span><span class="fu">is_link</span>(tx)]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>tx <span class="ot">=</span> tx[<span class="sc">!</span><span class="fu">is_hashtag</span>(tx)]</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>tx <span class="ot">=</span> tx[<span class="sc">!</span><span class="fu">is_mention</span>(tx)]</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>tx <span class="ot">=</span> tx[<span class="sc">!</span><span class="fu">is_number</span>(tx)]</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>tx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Hola"      "este"      "mensaje"   "no"        "tiene"     "otro"     
+ [7] "objetivo"  "que"       "ayudarnos" "a"         "filtrar"   "cosas"    
+[13] "que"       "no"        "son"       "palabras."</code></pre>
+</div>
+</div>
+<p>This looks good, now let’s remove <em>punctuation</em> and anything that is not an alpha-numeric character:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>tx <span class="ot">=</span> <span class="fu">lapply</span>(tx, gsub, <span class="at">pattern =</span> <span class="st">'[^[:alnum:]]'</span>, <span class="at">replacement =</span> <span class="st">''</span>) <span class="sc">|&gt;</span> <span class="fu">unlist</span>()</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>tx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Hola"      "este"      "mensaje"   "no"        "tiene"     "otro"     
+ [7] "objetivo"  "que"       "ayudarnos" "a"         "filtrar"   "cosas"    
+[13] "que"       "no"        "son"       "palabras" </code></pre>
+</div>
+</div>
+<p>Finally, let’s filter out any empty strings and get everything to lower case:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>tx <span class="ot">=</span> tx[tx <span class="sc">!=</span> <span class="st">''</span>] <span class="sc">|&gt;</span> <span class="fu">tolower</span>()</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>tx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "hola"      "este"      "mensaje"   "no"        "tiene"     "otro"     
+ [7] "objetivo"  "que"       "ayudarnos" "a"         "filtrar"   "cosas"    
+[13] "que"       "no"        "son"       "palabras" </code></pre>
+</div>
+</div>
+<p>Since we’ll be doing this same procedure to every <em>tweet</em> the cleanest way would be to pack it all into a function we can <code>apply</code> over the <em>tweets</em> vector:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>extract_words <span class="ot">=</span> <span class="cf">function</span> (x) {</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> x[<span class="sc">!</span><span class="fu">is_link</span>(x)]</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> x[<span class="sc">!</span><span class="fu">is_hashtag</span>(x)]</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> x[<span class="sc">!</span><span class="fu">is_mention</span>(x)]</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> x[<span class="sc">!</span><span class="fu">is_number</span>(x)]</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> <span class="fu">lapply</span>(x, gsub, <span class="at">pattern =</span> <span class="st">'[^[:alnum:]]'</span>, <span class="at">replacement =</span> <span class="st">''</span>) <span class="sc">|&gt;</span> <span class="fu">unlist</span>()</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> x[x <span class="sc">!=</span> <span class="st">''</span>]</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tolower</span>(x)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With this function we can <em>cleanse</em> every tweet in a single call to <code>lapply</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>tweets[[<span class="st">'full_text'</span>]] <span class="sc">|&gt;</span> <span class="fu">strsplit</span>(<span class="at">split =</span> <span class="st">'[[:space:]]'</span>) <span class="sc">|&gt;</span> <span class="fu">lapply</span>(extract_words) <span class="sc">|&gt;</span> <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+ [1] "a"             "tres"          "años"          "del"          
+ [5] "el"            "presidente"    "boric"         "no"           
+ [9] "ha"            "aprendido"     "absolutamente" "nada"         
+[13] "fue"           "cómplice"      "de"            "la"           
+[17] "legitimación"  "de"            "la"            "violencia"    
+[21] "y"             "de"            "la"            "destrucción"  
+[25] "de"            "un"            "chile"         "que"          
+[29] "es"            "más"           "pobre"         "inseguro"     
+[33] "y"             "desigual"      "que"           "antes"        
+[37] "a"             "pesar"         "de"            "eso"          
+[41] "sigue"         "enamorado"     "de"            "su"           
+[45] "fracasada"     "revolución"   
+
+[[2]]
+ [1] "banco"       "mundial"     "advierte"    "que"         "pobreza"    
+ [6] "en"          "chile"       "llegará"     "a"           "105"        
+[11] "en"          "la"          "desigualdad" "también"     "aumentará"  
+
+[[3]]
+ [1] "walmart"   "chile"     "remata"    "locales"   "y"         "terrenos" 
+ [7] "en"        "distintas" "comunas"   "de"        "santiago" 
+
+[[4]]
+ [1] "jadue"           "tu"              "y"               "tus"            
+ [5] "revolucionarios" "terroristas"     "que"             "mandaste"       
+ [9] "a"               "quemar"          "chile"           "eeres"          
+[13] "un"              "maldito"         "con"             "tu"             
+[17] "comunismo"       "andate"          "a"               "venezuela"      
+[21] "asqueroso"       "comunista"      
+
+[[5]]
+ [1] "el"          "borrachito"  "fue"         "el"          "culpable"   
+ [6] "de"          "la"          "división"    "y"           "destrucción"
+[11] "de"          "chile"       "no"          "merece"      "ningun"     
+[16] "mural"      
+
+[[6]]
+ [1] "yo"              "he"              "estado"          "en"             
+ [5] "varias"          "marchas"         "siempre"         "pacíficas"      
+ [9] "y"               "muchas"          "multitudinarias" "de"             
+[13] "cientos"         "de"              "miles"           "no"             
+[17] "crees"           "qué"             "hay"             "algo"           
+[21] "erróneo"         "en"              "algunas"         "causas"         
+[25] "que"             "se"              "promueven"       "que"            
+[29] "siempre"         "terminan"        "en"              "violencia"      
+[33] "o"               "que"             "nacen"           "de"             
+[37] "ella"            "a"               "veces"           "terroristas"    
+[41] "como"            "el"              "18o"             "no"             
+[45] "te"              "parece"          "raro"           </code></pre>
+</div>
+</div>
+<p>Now we have a list of character vectors containing only words, but most of those word aren’t <em>meaningful</em>. For this post we’ll use a rough hack and just filter those words that have between 5 and 10 characters. This will almost certainly crop all short illatives such as <em>de</em>, <em>y</em>, <em>para</em>; but is by no means a proper way of ensuring we’re left with all <em>meaninful</em> words (I’m sure <em>god</em> would agree that at the <em>end</em> the value of a <em>word</em> is not given by it’s number of characters). That said, let’s get into it:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>clean_tweets <span class="ot">=</span> tweets[[<span class="st">'full_text'</span>]] <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">strsplit</span>(<span class="at">split =</span> <span class="st">'[[:space:]+]'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(extract_words)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>words <span class="ot">=</span> <span class="fu">lapply</span>(clean_tweets, <span class="cf">function</span> (x) {</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">=</span> <span class="fu">nchar</span>(x)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  x[n <span class="sc">&gt;=</span> <span class="dv">5</span> <span class="sc">&amp;</span> n <span class="sc">&lt;=</span> <span class="dv">10</span>]</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>word_bag <span class="ot">=</span> <span class="fu">unlist</span>(words)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s take a look at the 12 most frequent words:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(word_bag) <span class="sc">|&gt;</span> <span class="fu">sort</span>(<span class="at">decreasing =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">13</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>word_bag
+     chile   gobierno      todos      boric     porque      ahora      tiene 
+      1639        108         87         85         80         79         79 
+     hacer     cuando presidente      desde  estallido      gente 
+        77         74         69         67         58         54 </code></pre>
+</div>
+</div>
+<p>The most frequent word is the one we used for the query, which is to be expected and gives us no info about the topics being commented. We should by all means remove this word:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>word_bag <span class="ot">=</span> <span class="fu">local</span>({</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  query <span class="ot">=</span> <span class="st">'chile'</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  word_bag[<span class="sc">!</span>(word_bag <span class="sc">%in%</span> query)]</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now this is boring, since we’re leaving out all semantic structure and treating text as a <em>word bag</em> we should at least make it look beautiful. By far the most compelling visualization for word fequencies is the <em>wordcloud</em>. We’ll use the <a href="https://cran.r-project.org/web/packages/wordcloud2/vignettes/wordcloud.html">wordcloud2</a> package along the <a href="https://github.com/karthik/wesanderson">wesanderson</a> color palettes to build one. Wordcloud’s main function expects a <code>data.frame</code> with <code>word</code> and <code>freq</code> as columns, so let’s construct that from our <em>word bag</em> and generate a cloud:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">'wordcloud2'</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">'wesanderson'</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>wf <span class="ot">=</span> <span class="fu">local</span>({</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  wb <span class="ot">=</span> <span class="fu">table</span>(word_bag)</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  word <span class="ot">=</span> <span class="fu">names</span>(wb)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  freq <span class="ot">=</span> <span class="fu">as.numeric</span>(wb)</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(word, freq)[freq <span class="sc">&gt;=</span> <span class="dv">10</span>, ]</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Nice colors from 'The Darjeeling Express'</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>clrs <span class="ot">=</span> <span class="fu">rep</span>(wesanderson<span class="sc">::</span><span class="fu">wes_palette</span>(<span class="st">'Darjeeling1'</span>, <span class="dv">5</span>), <span class="at">length.out =</span> <span class="fu">nrow</span>(wf))</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>wordcloud2<span class="sc">::</span><span class="fu">wordcloud2</span>(wf,</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">background =</span> <span class="st">'transparent'</span>,</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">color =</span> clrs,</span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> .<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="htmlwidget-cdfefc2e997ef70f32c7" style="width:100%;height:464px;" class="wordcloud2 html-widget"></div>
+<script type="application/json" data-for="htmlwidget-cdfefc2e997ef70f32c7">{"x":{"word":["acaba","actual","además","ahora","alguien","algún","algunas","algunos","amigo","antes","apoyo","aragua","argentina","ayuda","banco","basura","boric","brasil","buena","buenas","bueno","cabeza","calle","cambiar","cambio","celebrar","chileno","chilenos","cierto","claro","colombia","comunismo","comunista","comunistas","concierto","congreso","contra","cosas","creen","creer","crisis","cualquier","cuando","cuenta","culpa","deben","debería","decir","dejar","dejen","demandas","demás","democracia","derecha","derecho","derechos","desde","después","destruir","dicen","donde","durante","ecuador","educación","ejemplo","ellos","empresas","entonces","entrada","entre","escuchar","esperanza","estaba","estado","estafan","estallido","estamos","están","estar","estas","estás","estos","estoy","existe","extrema","fácil","falabella","falta","familia","favor","fecha","fernández","forma","fuera","fueron","fuerza","gabriel","ganas","gente","gobierno","gracias","grande","guerra","gusta","haber","hablar","hacen","hacer","haciendo","hagan","hasta","hecho","hicieron","historia","igual","importa","impuestos","impunidad","inflación","izquierda","jamás","junto","justicia","justo","libertad","libre","llegar","llegó","llorar","luego","malestar","mañana","manos","mayoría","medio","medios","mejor","menos","mentiras","merluzo","meses","metro","méxico","miedo","mientras","mierda","miles","millones","misma","mismo","mismos","momento","mucha","muchas","mucho","muchos","mujer","mundial","mundo","nacional","nadie","necesita","negro","ningún","nivel","noticias","nuestra","nuestro","nuestros","nueva","nuevo","nunca","octubre","octubrismo","orden","otras","otros","pablo","pagar","países","parece","parte","partido","pasado","pasaporte","pedir","pensar","persona","personas","piñera","plata","pobre","pobreza","poder","podría","policías","política","políticos","poner","porque","posible","presidente","primer","primera","problema","problemas","pronto","pueblo","puede","pueden","puedo","queda","quemar","quemaron","queremos","quien","quienes","quiere","quieren","quiero","realidad","rechazo","reforma","región","respuesta","sabemos","saber","sacar","salió","salir","salud","saludos","santiago","seguir","seguridad","señor","sería","servicio","siempre","siendo","sigue","siguen","sistema","sobre","social","sociales","somos","también","tanta","tanto","tardes","taylor","tenemos","tener","tenga","tengo","terrorismo","tiempo","tiendas","tiene","tienen","tienes","tierra","todas","todos","trabajar","trabajo","través","único","uruguay","usted","ustedes","vamos","veces","venezuela","venga","venir","verdad","viene","violencia","vivir"],"freq":[14,13,11,79,23,11,11,17,10,35,15,11,45,12,11,10,85,14,14,15,25,10,12,10,12,19,17,46,14,20,36,26,23,34,13,12,28,20,15,15,16,16,74,22,18,20,12,32,13,11,10,13,17,49,11,11,67,21,19,14,46,13,11,11,12,42,15,14,10,22,12,11,27,30,10,58,31,49,26,20,11,31,30,13,11,10,15,18,12,29,16,10,12,20,24,21,12,12,54,108,42,29,11,14,12,14,28,77,12,10,46,19,16,40,37,16,14,10,12,50,14,10,19,11,17,14,13,11,11,18,13,27,16,14,21,16,52,46,11,10,14,10,17,14,17,23,10,17,11,49,12,18,10,14,27,20,10,18,34,17,39,14,14,20,17,11,16,26,11,23,18,47,30,12,14,10,30,11,11,31,18,33,14,18,11,12,15,17,25,45,19,14,26,43,12,10,24,19,10,80,14,69,13,29,41,24,11,27,41,19,22,11,11,17,14,25,15,27,36,26,15,17,10,11,11,12,15,12,10,12,12,17,20,15,13,10,14,15,46,22,23,27,16,29,42,14,21,46,12,27,14,24,34,24,11,31,12,20,13,79,51,20,10,21,87,11,19,17,14,11,19,38,26,15,27,13,12,30,17,42,16],"fontFamily":"Segoe UI","fontWeight":"bold","color":["#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000","#00A08A","#F2AD00","#F98400","#5BBCD6","#FF0000"],"minSize":0,"weightFactor":0.5,"backgroundColor":"transparent","gridSize":0,"minRotation":-0.785398163397448,"maxRotation":0.785398163397448,"shuffle":true,"rotateRatio":0.4,"shape":"circle","ellipticity":0.65,"figBase64":null,"hover":null},"evals":[],"jsHooks":{"render":[{"code":"function(el,x){\n                        console.log(123);\n                        if(!iii){\n                          window.location.reload();\n                          iii = False;\n\n                        }\n  }","data":null}]}}</script>
+</div>
+</div>
+<section id="write-a-summary-and-conclusion-here" class="level2">
+<h2 class="anchored" data-anchor-id="write-a-summary-and-conclusion-here">Write a summary and conclusion here</h2>
+<hr>
+<div class="cell" data-file="script.r">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>Complete Code</strong></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="do">## ----r------------------------------------------------------------------------</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">'rtweet'</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Authenticate the currently logged-in user and store credentials, this needs to</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># be done only once per machine:</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co"># rtweet::auth_setup_default()</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Do not perform query if results are already stored:</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>tbl_file <span class="ot">=</span> <span class="st">'tweets_tbl.rds'</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>tweets_file <span class="ot">=</span> <span class="st">'tweets.csv'</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">file.exists</span>(tweets_file)) {</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  tweets <span class="ot">=</span> <span class="fu">read.csv</span>(tweets_file)</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  tweets <span class="ot">=</span> rtweet<span class="sc">::</span><span class="fu">search_tweets</span>(</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">'chile -filter:quote -filter:media lang:es'</span>,</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="dv">2000</span>,</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">include_rts =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">retryonratelimit =</span> <span class="cn">TRUE</span></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># let's save the tibble just in case and write a csv ommiting list cols</span></span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(tweets, tbl_file)</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>  tweets <span class="ot">=</span> tweets[, <span class="fu">sapply</span>(tweets, class) <span class="sc">!=</span> <span class="st">'list'</span>] <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write.csv</span>(tweets, tweets_file, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a><span class="do">## ----r------------------------------------------------------------------------</span></span>
+<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>is_link <span class="ot">=</span> <span class="cf">function</span> (x) <span class="fu">grepl</span>(<span class="st">'^[[:lower:]]+://.+'</span>, x)</span>
+<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>is_hashtag <span class="ot">=</span> <span class="cf">function</span> (x) <span class="fu">grepl</span>(<span class="st">'^#.+'</span>, x)</span>
+<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a>is_mention <span class="ot">=</span> <span class="cf">function</span> (x) <span class="fu">grepl</span>(<span class="st">'^@.+'</span>, x)</span>
+<span id="cb34-41"><a href="#cb34-41" aria-hidden="true" tabindex="-1"></a>is_number <span class="ot">=</span> <span class="cf">function</span> (x) <span class="fu">grepl</span>(<span class="st">'^[[:digit:]]+[[:punct:]]*$'</span>, x)</span>
+<span id="cb34-42"><a href="#cb34-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-43"><a href="#cb34-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-44"><a href="#cb34-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-45"><a href="#cb34-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-46"><a href="#cb34-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-47"><a href="#cb34-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-48"><a href="#cb34-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-49"><a href="#cb34-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-50"><a href="#cb34-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-51"><a href="#cb34-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-52"><a href="#cb34-52" aria-hidden="true" tabindex="-1"></a><span class="do">## ----r------------------------------------------------------------------------</span></span>
+<span id="cb34-53"><a href="#cb34-53" aria-hidden="true" tabindex="-1"></a>extract_words <span class="ot">=</span> <span class="cf">function</span> (x) {</span>
+<span id="cb34-54"><a href="#cb34-54" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> x[<span class="sc">!</span><span class="fu">is_link</span>(x)]</span>
+<span id="cb34-55"><a href="#cb34-55" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> x[<span class="sc">!</span><span class="fu">is_hashtag</span>(x)]</span>
+<span id="cb34-56"><a href="#cb34-56" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> x[<span class="sc">!</span><span class="fu">is_mention</span>(x)]</span>
+<span id="cb34-57"><a href="#cb34-57" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> x[<span class="sc">!</span><span class="fu">is_number</span>(x)]</span>
+<span id="cb34-58"><a href="#cb34-58" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> <span class="fu">lapply</span>(x, gsub, <span class="at">pattern =</span> <span class="st">'[^[:alnum:]]'</span>, <span class="at">replacement =</span> <span class="st">''</span>) <span class="sc">|&gt;</span> <span class="fu">unlist</span>()</span>
+<span id="cb34-59"><a href="#cb34-59" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> x[x <span class="sc">!=</span> <span class="st">''</span>]</span>
+<span id="cb34-60"><a href="#cb34-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tolower</span>(x)</span>
+<span id="cb34-61"><a href="#cb34-61" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb34-62"><a href="#cb34-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-63"><a href="#cb34-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-64"><a href="#cb34-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-65"><a href="#cb34-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-66"><a href="#cb34-66" aria-hidden="true" tabindex="-1"></a><span class="do">## ----r------------------------------------------------------------------------</span></span>
+<span id="cb34-67"><a href="#cb34-67" aria-hidden="true" tabindex="-1"></a>clean_tweets <span class="ot">=</span> tweets[[<span class="st">'full_text'</span>]] <span class="sc">|&gt;</span></span>
+<span id="cb34-68"><a href="#cb34-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">strsplit</span>(<span class="at">split =</span> <span class="st">'[[:space:]+]'</span>) <span class="sc">|&gt;</span></span>
+<span id="cb34-69"><a href="#cb34-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(extract_words)</span>
+<span id="cb34-70"><a href="#cb34-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-71"><a href="#cb34-71" aria-hidden="true" tabindex="-1"></a>words <span class="ot">=</span> <span class="fu">lapply</span>(clean_tweets, <span class="cf">function</span> (x) {</span>
+<span id="cb34-72"><a href="#cb34-72" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">=</span> <span class="fu">nchar</span>(x)</span>
+<span id="cb34-73"><a href="#cb34-73" aria-hidden="true" tabindex="-1"></a>  x[n <span class="sc">&gt;=</span> <span class="dv">5</span> <span class="sc">&amp;</span> n <span class="sc">&lt;=</span> <span class="dv">10</span>]</span>
+<span id="cb34-74"><a href="#cb34-74" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb34-75"><a href="#cb34-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-76"><a href="#cb34-76" aria-hidden="true" tabindex="-1"></a>word_bag <span class="ot">=</span> <span class="fu">unlist</span>(words)</span>
+<span id="cb34-77"><a href="#cb34-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-78"><a href="#cb34-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-79"><a href="#cb34-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-80"><a href="#cb34-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-81"><a href="#cb34-81" aria-hidden="true" tabindex="-1"></a><span class="do">## ----r------------------------------------------------------------------------</span></span>
+<span id="cb34-82"><a href="#cb34-82" aria-hidden="true" tabindex="-1"></a>word_bag <span class="ot">=</span> <span class="fu">local</span>({</span>
+<span id="cb34-83"><a href="#cb34-83" aria-hidden="true" tabindex="-1"></a>  query <span class="ot">=</span> <span class="st">'chile'</span></span>
+<span id="cb34-84"><a href="#cb34-84" aria-hidden="true" tabindex="-1"></a>  word_bag[<span class="sc">!</span>(word_bag <span class="sc">%in%</span> query)]</span>
+<span id="cb34-85"><a href="#cb34-85" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb34-86"><a href="#cb34-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-87"><a href="#cb34-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-88"><a href="#cb34-88" aria-hidden="true" tabindex="-1"></a><span class="do">## ----r------------------------------------------------------------------------</span></span>
+<span id="cb34-89"><a href="#cb34-89" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">'wordcloud2'</span>)</span>
+<span id="cb34-90"><a href="#cb34-90" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">'wesanderson'</span>)</span>
+<span id="cb34-91"><a href="#cb34-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-92"><a href="#cb34-92" aria-hidden="true" tabindex="-1"></a>wf <span class="ot">=</span> <span class="fu">local</span>({</span>
+<span id="cb34-93"><a href="#cb34-93" aria-hidden="true" tabindex="-1"></a>  wb <span class="ot">=</span> <span class="fu">table</span>(word_bag)</span>
+<span id="cb34-94"><a href="#cb34-94" aria-hidden="true" tabindex="-1"></a>  word <span class="ot">=</span> <span class="fu">names</span>(wb)</span>
+<span id="cb34-95"><a href="#cb34-95" aria-hidden="true" tabindex="-1"></a>  freq <span class="ot">=</span> <span class="fu">as.numeric</span>(wb)</span>
+<span id="cb34-96"><a href="#cb34-96" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(word, freq)[freq <span class="sc">&gt;=</span> <span class="dv">10</span>, ]</span>
+<span id="cb34-97"><a href="#cb34-97" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb34-98"><a href="#cb34-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-99"><a href="#cb34-99" aria-hidden="true" tabindex="-1"></a><span class="co"># Nice colors from 'The Darjeeling Express'</span></span>
+<span id="cb34-100"><a href="#cb34-100" aria-hidden="true" tabindex="-1"></a>clrs <span class="ot">=</span> <span class="fu">rep</span>(wesanderson<span class="sc">::</span><span class="fu">wes_palette</span>(<span class="st">'Darjeeling1'</span>, <span class="dv">5</span>), <span class="at">length.out =</span> <span class="fu">nrow</span>(wf))</span>
+<span id="cb34-101"><a href="#cb34-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-102"><a href="#cb34-102" aria-hidden="true" tabindex="-1"></a>wordcloud2<span class="sc">::</span><span class="fu">wordcloud2</span>(wf,</span>
+<span id="cb34-103"><a href="#cb34-103" aria-hidden="true" tabindex="-1"></a>  <span class="at">background =</span> <span class="st">'transparent'</span>,</span>
+<span id="cb34-104"><a href="#cb34-104" aria-hidden="true" tabindex="-1"></a>  <span class="at">color =</span> clrs,</span>
+<span id="cb34-105"><a href="#cb34-105" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> .<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'alternate';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } 
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/rmvegasm">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://stackoverflow.com/users/8083545/coy">
+      <i class="bi bi-stack-overflow" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://linkedin.com/in/rmvegasm">
+      <i class="bi bi-linkedin" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="mailto:rmvegasm@gmail.com">
+      <i class="bi bi-envelope" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>   
+    <div class="nav-footer-right">Powered by <a href="https://quarto.org">quarto</a> and <a href="https://github.com">github</a>.</div>
+  </div>
+</footer>
+
+
+
+</body></html>

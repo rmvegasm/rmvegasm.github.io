@@ -1,0 +1,37 @@
+project:
+  type: website
+
+website:
+  title: "COY"
+  favicon: profile_oct_2022.png
+  navbar:
+    left:
+      - href: index.qmd
+        text: "Home"
+      - about.qmd
+      - text: "Blog"
+        href: blog/index.qmd
+    logo: profile_oct_2022.png
+    background: gray-800
+  page-footer:
+    right: Powered by [quarto](https://quarto.org) and [github](https://github.com).
+    left:
+      - icon: github
+        href: https://github.com/rmvegasm
+      - icon: stack-overflow
+        href: https://stackoverflow.com/users/8083545/coy
+      - icon: linkedin
+        href: https://linkedin.com/in/rmvegasm
+      - icon: envelope
+        href: mailto:rmvegasm@gmail.com
+    border: false
+    background: gray-800
+    
+
+format:
+  html:
+    theme:
+      dark: [darkly, custom.scss]
+      light: [flatly, custom.scss]
+    css: styles.css
+    toc: true
