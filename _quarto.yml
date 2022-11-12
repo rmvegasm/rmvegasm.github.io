@@ -3,6 +3,7 @@ project:
 
 website:
   title: "COY"
+  site-url: 'https://rmvegasm.github.io'
   favicon: profile_oct_2022.png
   navbar:
     left:
