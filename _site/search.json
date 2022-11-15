@@ -4,7 +4,21 @@
     "href": "blog/index.html",
     "title": "Blog",
     "section": "",
-    "text": "R\n\n\nwordcloud\n\n\nrtweet\n\n\ntutorial\n\n\n\n\n\n\n\n\n\n\n\nSep 17, 2022\n\n\n\n\n\n\nNo matching items"
+    "text": "Python\n\n\ndsml\n\n\nnotes\n\n\n\n\n\n\n\n\n\n\n\nNov 14, 2022\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nR\n\n\nwordcloud\n\n\nrtweet\n\n\ntutorial\n\n\n\n\n\n\n\n\n\n\n\nSep 17, 2022\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "blog/posts/python_basics/index.html",
+    "href": "blog/posts/python_basics/index.html",
+    "title": "Basic data structures in Python",
+    "section": "",
+    "text": "Here I’ll explore the basic data structures in Python, how to create and manipulate them and how they differ from one another."
+  },
+  {
+    "objectID": "blog/posts/python_basics/index.html#lists",
+    "href": "blog/posts/python_basics/index.html#lists",
+    "title": "Basic data structures in Python",
+    "section": "Lists",
+    "text": "Lists\nA list is an ordered collection of objects:\n\na_list = [1, 2, 3, 4, 5]\nprint(a_list)\n\nanother_list = [5, 4, 3, 2, 1]\nprint(another_list)\n\n# order matters:\nprint(a_list == another_list)\n\n[1, 2, 3, 4, 5]\n[5, 4, 3, 2, 1]\nFalse\n\n\nObjects within a list can be of different types:\n\nmixed_list = [1, 2, 'a', 'b', True, False]\nfor item in mixed_list:\n        print(f\"{item} is of type\", type(item))\n\n1 is of type <class 'int'>\n2 is of type <class 'int'>\na is of type <class 'str'>\nb is of type <class 'str'>\nTrue is of type <class 'bool'>\nFalse is of type <class 'bool'>\n\n\nIndexing is called slicing in python. I think there’s a lot in this name since the logic behind it is more related to slicing between elements than to retrieving a specified element. We slice using the syntax list[from = 0: to = len(.) - 1: step = 1]:\n\n# the first two elements\nprint(a_list[0:2])\n\n# every other element\nprint(a_list[::2])\n\n[1, 2]\n[1, 3, 5]\n\n\nIt also works with negative indexes, counting from the last element backwards:\n\n# without the last element\nprint(a_list[0:-1])\n\n# without the last 3\nprint(a_list[0:-3])\n\n# the same using default value\nprint(a_list[:-3])\n\n# in reverse order\nprint(a_list[::-1])\n\n[1, 2, 3, 4]\n[1, 2]\n[1, 2]\n[5, 4, 3, 2, 1]\n\n\nThe element sliced is always that one to the right of the the index. Here’s the logic:\npositive:  0...1...2...3...5...6\nvalues:    | 1 | 2 | 3 | 4 | 5 |\nnegative: -5..-4..-3..-2..-1...0\nIf we use a single number without :, we get the element istself instead of another list:\n\n# the second element as a list\nprint(a_list[1:2], type(a_list[1:2]))\n\n# the second element istself\nprint(a_list[1], type(a_list[1]))\n\n[2] <class 'list'>\n2 <class 'int'>\n\n\nLists can be concatenated with the + operand:\n\nprint(a_list + another_list)\n\n[1, 2, 3, 4, 5, 5, 4, 3, 2, 1]\n\n\nWe can assign different elements using the indexes:\n\n# modify an element\na_list[2] = 99\nprint(a_list)\n\n# modify a bunch of elements\na_list[3:5] = [11, 17]\nprint(a_list)\n\n[1, 2, 99, 4, 5]\n[1, 2, 99, 11, 17]"
   },
   {
     "objectID": "blog/posts/wordcloud/index.html",
@@ -40,5 +54,19 @@
     "title": "About Me",
     "section": "",
     "text": "I’m a self-taught R programmer with a strong research background. I love learning, take pride in finding new and creative solutions to problems, fixing broken things and explaining complex ideas in very simple terms. I thrive by helping others."
+  },
+  {
+    "objectID": "blog/posts/python_basics/index.html#sets-and-dictionaries",
+    "href": "blog/posts/python_basics/index.html#sets-and-dictionaries",
+    "title": "Basic data structures in Python",
+    "section": "Sets and Dictionaries",
+    "text": "Sets and Dictionaries\nSets and dictionaries are both constructed using curly braces {}. A set is an unordered collection of unique elements that can be of different types:\n\n# a collection\na_set = {1, 2, 3, 4, 5}\nprint(a_set)\n\n# with is no order\nprint(a_set == {5, 4, 3, 2, 1})\n\n# and mixed type elements\nmixed_set = {1, 2, 3, 'a', True}\nprint(mixed_set)\n\n{1, 2, 3, 4, 5}\nTrue\n{3, 1, 'a', 2}\n\n\nRepeated elements are ignored, elements must be unique:\n\nprint({1, 2, 2, 3, 4, 4, 5})\nprint(a_set == {1, 2, 2, 5, 4, 3})\n\n{1, 2, 3, 4, 5}\nTrue\n\n\nA dictionary is a collection of key : value pairs:\n\na_dict = {'a' : 1, 'b' : 2, 'c' : 3}\nprint(a_dict)\n\n{'a': 1, 'b': 2, 'c': 3}"
+  },
+  {
+    "objectID": "blog/posts/python_basics/index.html#tuples",
+    "href": "blog/posts/python_basics/index.html#tuples",
+    "title": "Basic data structures in Python",
+    "section": "Tuples",
+    "text": "Tuples"
   }
 ]
