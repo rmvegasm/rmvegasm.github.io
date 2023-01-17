@@ -1,0 +1,180 @@
+---
+title: Basic data structures in Python
+categories:
+  - Python
+  - dsml
+  - notes
+date: "2022/11/14"
+execute:
+  enabled: true
+  freeze: false
+---
+
+Here I'll explore the basic data structures in Python, how to create and
+manipulate them and how they differ from one another.
+
+## Lists
+
+A list is an **ordered** collection of objects:
+
+```{python}
+a_list = [1, 2, 3, 4, 5]
+print(a_list)
+
+another_list = [5, 4, 3, 2, 1]
+print(another_list)
+
+# order matters:
+print(a_list == another_list)
+```
+
+Objects within a list can be of different types:
+
+```{python}
+mixed_list = [1, 2, 'a', 'b', True, False]
+for item in mixed_list:
+        print(f"{item} is of type", type(item))
+
+```
+
+Indexing is called *slicing* in python. I think there's a lot in this name since
+the logic behind it is more related to *slicing between elements* than to
+retrieving a specified element. We *slice* using the syntax `list[from = 0: to =
+len(.) - 1: step = 1]`:
+
+```{python}
+# the first two elements
+print(a_list[0:2])
+
+# every other element
+print(a_list[::2])
+```
+
+It also works with negative indexes, counting from the last element backwards:
+
+```{python}
+# without the last element
+print(a_list[0:-1])
+
+# without the last 3
+print(a_list[0:-3])
+
+# the same using default value
+print(a_list[:-3])
+
+# in reverse order
+print(a_list[::-1])
+```
+
+The element *sliced* is always that one to the right of the the index. Here's
+the logic:
+
+```
+positive:  0...1...2...3...5...6
+values:    | 1 | 2 | 3 | 4 | 5 |
+negative: -5..-4..-3..-2..-1...0
+```
+
+If we use a single number without `:`, we get *the element istself* instead of
+another list:
+
+```{python}
+# the second element as a list
+print(a_list[1:2], type(a_list[1:2]))
+
+# the second element istself
+print(a_list[1], type(a_list[1]))
+```
+
+### Modification and Arithmetic
+
+We can assign a single element using indexes, or a bunch of them by slicing and
+providing a `list` as replacement:
+
+```{python}
+# modify an element
+a_list[2] = 99
+print(a_list)
+
+# modify a bunch of elements
+a_list[3:5] = [11, 17]
+print(a_list)
+```
+
+Since `list`s can hold elements of different types, there's no arithmetic on
+them. Operands will work differently or not at all. For instance, `list`s can be
+concatenated with the `+` operand:
+
+```{python}
+# `+` concatenates, as with strings
+print(a_list + another_list)
+```
+
+## Sets and Dictionaries
+
+*Sets* and *dictionaries* are both constructed using curly braces `{}`. A set is
+an **unordered** collection of **unique** elements that can be of different
+types:
+
+```{python}
+# a collection
+a_set = {1, 2, 3, 4, 5}
+print(a_set)
+
+# there is no order
+print(a_set == {5, 4, 3, 2, 1})
+
+# and mixed type elements
+mixed_set = {1, 2, 3, 'a', True}
+print(mixed_set)
+```
+
+Repeated elements are ignored, elements must be unique:
+
+```{python}
+print({1, 2, 2, 3, 4, 4, 5})
+print(a_set == {1, 2, 2, 5, 4, 3})
+```
+
+A *dictionary* is a collection of `key : value` pairs:
+
+```{python}
+a_dict = {'a' : 1, 'b' : 2, 'c' : 3}
+print(a_dict)
+```
+
+As sets, dictionaries can hold different kinds of objects. Unlike sets,
+dictionaries can be subsetted (and modified) by the `key`:
+
+```{python}
+# get 'a'
+print('element "a" is', a_dict['a'])
+
+# change 'a'
+a_dict['a'] = 'banana'
+print('but now it is', a_dict['a'])
+```
+
+## Tuples
+
+Tuples are **oredered**, **inmutable** collections of elements. They can hold
+any type of object, can be *indexed* and *sliced*:
+
+```{python}
+a_tuple = (1, 2, True, [1, 2])
+
+# indexing
+print(a_tuple[2])
+
+# slicing
+print(a_tuple[::2])
+```
+
+They cannot be modified, but mutable elements within can be:
+
+```{python}
+# modify the first element on the list
+a_tuple[3][0] = 99
+print(a_tuple)
+```
+
