@@ -10,7 +10,7 @@ website:
       - href: index.qmd
         text: "Home"
       - about.qmd
-      - text: "Blog"
+      - text: "Notes"
         href: blog/index.qmd
     logo: profile_oct_2022.png
     background: gray-800

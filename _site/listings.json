@@ -3,7 +3,8 @@
     "listing": "/blog/index.html",
     "items": [
       "/blog/posts/python_basics/index.html",
-      "/blog/posts/wordcloud/index.html"
+      "/blog/posts/wordcloud/index.html",
+      "/blog/posts/poisson_process/index.html"
     ]
   }
 ]

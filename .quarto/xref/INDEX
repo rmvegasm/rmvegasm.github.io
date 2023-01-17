@@ -58,5 +58,8 @@
   },
   "blog/posts/python_basics/index.qmd": {
     "index.html": "0b46ef81"
+  },
+  "blog/posts/poisson_process/index.qmd": {
+    "index.html": "cef5c4a1"
   }
 }
