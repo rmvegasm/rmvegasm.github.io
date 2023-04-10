@@ -2,12 +2,18 @@
 title: "Exploring the Poisson Process for age-depth models"
 author: "Rodrigo M. Vega"
 date: "2021/11/12"
+fig-width: 7
+fig-height: 11
 categories:
   - R
   - schron
   - poisson process
   - chronologies
 ---
+
+::::: {.callout-note}
+Check `ggdist` package for plotting distributions
+:::::
 
 Here we will explore the poisson process as a *prior* to model age-depth
 relations. The goal is to be able to add ^14^C data one at a time, and adjust
